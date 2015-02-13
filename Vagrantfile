@@ -3,7 +3,7 @@
 
 CLUSTER_SIZE = 3
 FROM_IP = "172.16.0.101"
-HOSTNAME_PREF = 'h'
+HOSTNAME_PREF = 'hc'
 
 def get_nodes (count, from_ip, hostname_pref)
     nodes = []
@@ -32,7 +32,7 @@ def attachnode()
 end
 
 Vagrant.configure("2") do |config|
-    config.vm.box = "hashicorp/precise64"
+    config.vm.box = "chef/centos-6.5"
     config.ssh.username = "vagrant"
     config.ssh.password = "vagrant"
     config.ssh.shell = "bash -c 'BASH_ENV=/etc/profile exec bash'"
