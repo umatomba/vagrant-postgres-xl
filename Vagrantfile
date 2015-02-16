@@ -3,7 +3,7 @@
 
 CLUSTER_SIZE = 3
 FROM_IP = "172.16.0.101"
-HOSTNAME_PREF = 'hc'
+HOSTNAME_PREF = 'xl'
 
 def get_nodes (count, from_ip, hostname_pref)
     nodes = []
@@ -39,7 +39,7 @@ Vagrant.configure("2") do |config|
 
     if Vagrant.has_plugin?("vagrant-cachier")
         config.cache.scope = :box
-        config.cache.enable :apt
+        config.cache.enable :yum
     end
 
     cluster_nodes = get_nodes(CLUSTER_SIZE, FROM_IP, HOSTNAME_PREF)
@@ -50,7 +50,7 @@ Vagrant.configure("2") do |config|
         config.vm.define hostname do |box|
             box.vm.hostname = "#{hostname}"
             box.vm.network :private_network, ip: "#{hostaddr}", :netmask => "255.255.0.0"
-            box.vm.provision :shell, :inline => provision_node(hostaddr, cluster_ips)
+            #box.vm.provision :shell, :inline => provision_node(hostaddr, cluster_ips)
             if number == 1
                 #box.vm.provision :shell, :inline => start_cluster()
             else
@@ -58,4 +58,12 @@ Vagrant.configure("2") do |config|
             end
         end
     end
+
+    config.vm.provision "chef_solo" do |chef|
+        chef.add_recipe "pgxl"
+        chef.roles_path = "roles"
+        chef.add_role("pgxl-minimal")
+        
+    end
+
 end
