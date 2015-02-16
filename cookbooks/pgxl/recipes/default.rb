@@ -184,6 +184,13 @@ template "/var/lib/pgxl/9.2/data/coord/postgresql.conf" do
   group "pgxl"
 end
 
+template "/var/lib/pgxl/9.2/data/coord/pg_hba.conf" do
+  source "pg_hba.conf.erb"
+  mode 0600
+  owner "pgxl"
+  group "pgxl"
+end
+
 # Using chown command instead of 'directory recursive' resource
 # because the resource does not work correctly.
 bash 'chown' do
@@ -228,6 +235,13 @@ end
 
 template "/var/lib/pgxl/9.2/data/data/postgresql.conf" do
   source "postgresql-data.conf.erb"
+  mode 0600
+  owner "pgxl"
+  group "pgxl"
+end
+
+template "/var/lib/pgxl/9.2/data/data/pg_hba.conf" do
+  source "pg_hba.conf.erb"
   mode 0600
   owner "pgxl"
   group "pgxl"
