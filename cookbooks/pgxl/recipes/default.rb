@@ -269,3 +269,15 @@ bash 'pg_ctl_start' do
     EOH
   not_if { File.exists?("/var/lib/pgxl/9.2/data/data/postmaster.pid") }
 end
+
+bash 'prepare' do
+  user "pgxl"
+  code <<-EOH
+    /usr/postgres-xl-9.2/bin/psql postgres -h 127.0.0.1 -p 5432 -U pgxl -c "CREATE NODE data WITH (HOST = 'localhost', type = 'datanode', PORT = 5433);"
+    /usr/postgres-xl-9.2/bin/psql postgres -h 127.0.0.1 -p 5433 -U pgxl -c "CREATE NODE coord WITH (HOST = 'localhost', type = 'coordinator', PORT = 5432);"
+    /usr/postgres-xl-9.2/bin/psql postgres -h 127.0.0.1 -p 5433 -U pgxl -c "ALTER NODE data WITH (TYPE = 'datanode', PORT = 5433);"
+    /usr/postgres-xl-9.2/bin/psql postgres -h 127.0.0.1 -p 5432 -U pgxl -c "select pgxc_pool_reload();" 
+    /usr/postgres-xl-9.2/bin/psql postgres -h 127.0.0.1 -p 5433 -U pgxl -c "select pgxc_pool_reload();"
+    /usr/postgres-xl-9.2/bin/createdb -U pgxl -h 127.0.0.1 -p 5432 mydb
+    EOH
+end
